@@ -1,0 +1,6 @@
+@CodeWithMe_HostAddress = http://localhost:5228
+
+GET {{CodeWithMe_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
