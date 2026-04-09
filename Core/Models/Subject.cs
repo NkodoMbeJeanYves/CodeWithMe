@@ -1,15 +1,23 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CodeWithMe.Core.Models
 {
-    [PrimaryKey(nameof(Subject.subject_id))]
+    [PrimaryKey(nameof(Subject.SubjectId))]
     public class Subject
     {
-        public required string subject_id { get; set; }
-        public required string subject_name { get; set; }
+        [Column("subject_id")]
+        public required string SubjectId { get; set; }
+        [Column("subject_name")]
+        public required string SubjectName { get; set; }
 
-        public string? description { get; set; }
-        public DateTime created_at { get; set; }
-        public DateTime updated_at { get; set; }
+        [Column("description")]
+        public string? Description { get; set; }
+
+        [Column("created_at")]
+        public DateTime CreatedAt  { get; set; }
+
+        [Column("updated_at")]
+        public DateTime UpdatedAt { get; set; }
     }
 }

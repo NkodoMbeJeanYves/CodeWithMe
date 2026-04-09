@@ -1,4 +1,5 @@
 using CodeWithMe.Core;
+using CodeWithMe.Core.Models;
 using CodeWithMe.EndPoints;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,26 +28,12 @@ builder.Services.AddSwaggerGen(
    }
    );
 
-//Enabling Logger
+// Enabling Logger
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
-
-// Add database context before building the app
-// ref: https://www.nuget.org/packages/Pomelo.EntityFrameworkCore.MySql#readme-body-tab
-var connectionString = builder.Configuration.GetConnectionString("ApiConnection");
-var serverVersion = new MySqlServerVersion(new Version(8, 4, 3));
-// Replace 'YourDbContext' with the name of your own DbContext derived class.
-builder.Services.AddDbContext<ApiContext>(
-    dbContextOptions => dbContextOptions
-        .UseMySql(connectionString, serverVersion)
-        // The following three options help with debugging, but should
-        // be changed or removed for production.
-        .LogTo(Console.WriteLine, LogLevel.Information)
-        .EnableSensitiveDataLogging()
-        .EnableDetailedErrors()
-);
-
+// Seed Subjects
+builder.seedSubjects();
 
 var app = builder.Build();
 
@@ -62,7 +49,7 @@ app.MapGet("/", static () => "Hello World!");
 app.MapGameEndPoints();
 
 // Run database migrations at startup
-app.MigrateDb();
+//app.MigrateDb();
 
 app.UseHttpsRedirection();
 
