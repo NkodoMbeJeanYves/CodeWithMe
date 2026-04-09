@@ -61,6 +61,9 @@ app.MapGet("/", static () => "Hello World!");
 
 app.MapGameEndPoints();
 
+// Run database migrations at startup
+app.MigrateDb();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

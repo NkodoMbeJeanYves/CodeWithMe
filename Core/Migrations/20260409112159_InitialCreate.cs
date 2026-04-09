@@ -13,7 +13,7 @@ namespace CodeWithMe.Core.Migrations
         {
             migrationBuilder.AlterDatabase()
                 .Annotation("MySql:CharSet", "utf8mb4");
-
+            
             migrationBuilder.CreateTable(
                 name: "Subjects",
                 columns: table => new
