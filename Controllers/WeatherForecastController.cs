@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CodeWithMe.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/weather")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]
@@ -28,6 +28,16 @@ namespace CodeWithMe.Controllers
                 Summary = Summaries[Random.Shared.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+
+        [HttpPost("post")]
+        public IActionResult Register(WeatherForecast w) {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // returns validation errors
+            }
+            return Ok("very good");
         }
     }
 }

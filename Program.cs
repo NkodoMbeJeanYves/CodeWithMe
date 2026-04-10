@@ -1,14 +1,14 @@
 using CodeWithMe.Core;
-using CodeWithMe.Core.Models;
 using CodeWithMe.EndPoints;
-using Microsoft.EntityFrameworkCore;
+using CodeWithMe.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-//builder.Services.AddValidation(); // This should be in Program.cs
+//builder.Services.AddScoped<FakeService>();
+builder.Services.AddSingleton<FakeService>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
@@ -50,9 +50,11 @@ app.MapGet("/", static () => "Hello World!");
 
 app.MapGameEndPoints();
 
+app.MapSubjectEndPoints();
+
 // Run database migrations, seed at startup
 // Ensure Database is populated and up-to-date with the latest schema changes
-app.MigrateDb();
+// app.MigrateDb();
 
 app.UseHttpsRedirection();
 

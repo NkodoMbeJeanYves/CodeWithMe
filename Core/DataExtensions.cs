@@ -53,7 +53,15 @@ namespace CodeWithMe.Core
             // ref: https://www.nuget.org/packages/Pomelo.EntityFrameworkCore.MySql#readme-body-tab
             var connectionString = builder.Configuration.GetConnectionString("ApiConnection");
             var serverVersion = new MySqlServerVersion(new Version(8, 4, 3));
-            // Replace 'YourDbContext' with the name of your own DbContext derived class.
+
+            /**
+             * ApiContext has a scoped service lifetime because:
+             * 1. It ensures that a new instance of ApiContext is created per request, which is important for managing database connections and ensuring thread safety.
+             * 2. It allows for better performance and resource management by reusing the same instance of ApiContext within a single request, while still providing isolation between different requests.
+             * 3. It ensures that the database context is properly disposed of at the end of each request, preventing potential memory leaks and ensuring that database connections are released back to the connection pool in a timely manner.
+             * 4. ApiContext is not thread-safe. Scope avoids to concurrency issues that could arise if multiple requests were to share the same instance of ApiContext.
+             * 5. Makes it easier to manage transactions and ensure data consistency.
+             */
             builder.Services.AddDbContext<ApiContext>(
                 dbContextOptions => dbContextOptions
                     .UseMySql(connectionString, serverVersion)

@@ -20,7 +20,6 @@ namespace CodeWithMe
         string Genre,
 
         [Required]
-        [StringLength(20, ErrorMessage = "Description field must be lower than 20 characters", MinimumLength = 5)]
         [DataType(DataType.Date, ErrorMessage = "The input must be a correct date format (yyyy-mm-dd)")]
         DateOnly ReleaseDate,
 

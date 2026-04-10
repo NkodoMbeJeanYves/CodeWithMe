@@ -1,5 +1,4 @@
-﻿using CodeWithMe.Controllers;
-using System.Reflection;
+﻿using CodeWithMe.Core.Services;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -18,7 +17,7 @@ namespace CodeWithMe.EndPoints
         public static void MapGameEndPoints(this WebApplication app)
         {
             var group = app.MapGroup(GAME_END_POINT).WithTags("Games");
-            group.MapGet("/", () => _games);
+            group.MapGet("/", (FakeService service) => service.GetMessage());
 
             group.MapGet("/{id}", (int id) =>
             {
