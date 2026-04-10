@@ -28,12 +28,14 @@ builder.Services.AddSwaggerGen(
    }
    );
 
+// Establish Database connection
+builder.establishConnection();
+
 // Enabling Logger
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
 builder.Logging.AddDebug();
-// Seed Subjects
-builder.seedSubjects();
+
 
 var app = builder.Build();
 
@@ -48,8 +50,9 @@ app.MapGet("/", static () => "Hello World!");
 
 app.MapGameEndPoints();
 
-// Run database migrations at startup
-//app.MigrateDb();
+// Run database migrations, seed at startup
+// Ensure Database is populated and up-to-date with the latest schema changes
+app.MigrateDb();
 
 app.UseHttpsRedirection();
 

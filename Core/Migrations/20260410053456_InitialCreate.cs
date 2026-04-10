@@ -13,9 +13,9 @@ namespace CodeWithMe.Core.Migrations
         {
             migrationBuilder.AlterDatabase()
                 .Annotation("MySql:CharSet", "utf8mb4");
-            
+
             migrationBuilder.CreateTable(
-                name: "Subjects",
+                name: "CWM_Subjects",
                 columns: table => new
                 {
                     subject_id = table.Column<string>(type: "varchar(255)", nullable: false)
@@ -29,7 +29,7 @@ namespace CodeWithMe.Core.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Subjects", x => x.subject_id);
+                    table.PrimaryKey("PK_CWM_Subjects", x => x.subject_id);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
         }
@@ -38,7 +38,7 @@ namespace CodeWithMe.Core.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Subjects");
+                name: "CWM_Subjects");
         }
     }
 }

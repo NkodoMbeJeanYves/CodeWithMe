@@ -13,12 +13,41 @@ namespace CodeWithMe.Core
          */
         public static void MigrateDb(this WebApplication app)
         {
-            using var scope = app.Services.CreateScope();
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApiContext>();
-            dbContext.Database.Migrate();
+            using (var scope = app.Services.CreateScope())
+            {
+                var dbContext = scope.ServiceProvider.GetRequiredService<ApiContext>();
+                dbContext.Database.Migrate();   // ensures DB is up-to-date, executing migration
+
+                if (!dbContext.Set<Subject>().Any())
+                {
+                    dbContext.Set<Subject>().AddRange(
+                        new Subject
+                        {
+                            SubjectId = "math",
+                            SubjectName = "Mathematics",
+                            Description = "The study of numbers, shapes, and patterns."
+                        },
+                        new Subject
+                        {
+                            SubjectId = "physics",
+                            SubjectName = "Physics",
+                            Description = "The study of matter, energy, and the fundamental forces of nature."
+                        },
+                        new Subject
+                        {
+                            SubjectId = "chemistry",
+                            SubjectName = "Chemistry",
+                            Description = "The study of substances, their properties, and how they interact with each other."
+                        }
+                    );
+                    dbContext.SaveChanges();
+                }
+
+            }
+
         }
 
-        public static void seedSubjects(this WebApplicationBuilder builder)
+        public static void establishConnection(this WebApplicationBuilder builder)
         {
             // Add database context before building the app
             // ref: https://www.nuget.org/packages/Pomelo.EntityFrameworkCore.MySql#readme-body-tab
@@ -33,34 +62,6 @@ namespace CodeWithMe.Core
                     .LogTo(Console.WriteLine, LogLevel.Information)
                     .EnableSensitiveDataLogging()
                     .EnableDetailedErrors()
-                    .UseSeeding((context, _) => {
-                        Console.WriteLine("Seeding Subjects..." + context.Set<Subject>().Any(), !context.Set<Subject>().Any());
-                        if (context.Set<Subject>().Any())
-                        {
-                            context.Set<Subject>().AddRange(
-                                new Subject
-                                {
-                                    SubjectId = "math",
-                                    SubjectName = "Mathematics",
-                                    Description = "The study of numbers, shapes, and patterns."
-                                },
-                                new Subject
-                                {
-                                    SubjectId = "physics",
-                                    SubjectName = "Physics",
-                                    Description = "The study of matter, energy, and the fundamental forces of nature."
-                                },
-                                new Subject
-                                {
-                                    SubjectId = "chemistry",
-                                    SubjectName = "Chemistry",
-                                    Description = "The study of substances, their properties, and how they interact with each other."
-                                }
-                            );
-                            context.SaveChanges();
-                        }
-                    })
-
             );
         }
     }

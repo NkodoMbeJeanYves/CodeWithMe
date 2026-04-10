@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CodeWithMe.Core.Models
 {
     [PrimaryKey(nameof(Subject.SubjectId))]
+    [Table("CWM_Subjects")]
     public class Subject
     {
         [Column("subject_id")]

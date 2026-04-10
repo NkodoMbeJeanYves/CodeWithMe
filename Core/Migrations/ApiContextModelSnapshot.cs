@@ -24,25 +24,30 @@ namespace CodeWithMe.Core.Migrations
 
             modelBuilder.Entity("CodeWithMe.Core.Models.Subject", b =>
                 {
-                    b.Property<string>("subject_id")
-                        .HasColumnType("varchar(255)");
+                    b.Property<string>("SubjectId")
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("subject_id");
 
-                    b.Property<DateTime>("created_at")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("created_at");
 
-                    b.Property<string>("description")
-                        .HasColumnType("longtext");
+                    b.Property<string>("Description")
+                        .HasColumnType("longtext")
+                        .HasColumnName("description");
 
-                    b.Property<string>("subject_name")
+                    b.Property<string>("SubjectName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("subject_name");
 
-                    b.Property<DateTime>("updated_at")
-                        .HasColumnType("datetime(6)");
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("updated_at");
 
-                    b.HasKey("subject_id");
+                    b.HasKey("SubjectId");
 
-                    b.ToTable("Subjects");
+                    b.ToTable("CWM_Subjects");
                 });
 #pragma warning restore 612, 618
         }

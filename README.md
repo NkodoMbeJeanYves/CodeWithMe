@@ -32,6 +32,11 @@ dotnet ef migrations add InitialCreate --output-dir Core/Migrations
 ```
 
 ---
+>  ⚠️ To undo this action
+
+```bash
+dotnet ef migrations remove
+```
 
 ## 4. Apply Migration to Database
 ```bash
