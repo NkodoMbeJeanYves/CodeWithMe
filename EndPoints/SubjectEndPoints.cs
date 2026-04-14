@@ -10,7 +10,7 @@ namespace CodeWithMe.EndPoints
 
         public static void MapSubjectEndPoints(this WebApplication app)
         {
-            var group = app.MapGroup(SUBJECT_END_POINT).WithTags("Subjects");
+            var group = app.MapGroup(SUBJECT_END_POINT).WithTags("Subjects").RequireAuthorization();
             group.MapGet("/", async (ApiContext db) => await db.Subjects.Select(subject => new SubjectDto(
                 subject.SubjectId,
                 subject.SubjectName,
