@@ -6,11 +6,11 @@ namespace CodeWithMe.EndPoints
 {
     public static class SubjectEndPoints
     {
-        const string SUBJECT_END_POINT = "/subjects";
+        const string SUBJECT_END_POINT = "api/subjects";
 
         public static void MapSubjectEndPoints(this WebApplication app)
         {
-            var group = app.MapGroup(SUBJECT_END_POINT).WithTags("Subjects");
+            var group = app.MapGroup(SUBJECT_END_POINT).WithTags("Subjects").RequireAuthorization();
             group.MapGet("/", async (ApiContext db) => await db.Subjects.Select(subject => new SubjectDto(
                 subject.SubjectId,
                 subject.SubjectName,
