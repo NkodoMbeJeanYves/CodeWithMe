@@ -27,8 +27,7 @@ namespace CodeWithMe.Core
            Name = "Authorization",
            In = ParameterLocation.Header,
            Type = SecuritySchemeType.Http,
-           Scheme = "Bearer"
-
+           Scheme = "Bearer" // ✅ This tells Swagger to prepend "Bearer "
        });
        // Require token for all endpoints unless AllowAnonymous
        it.AddSecurityRequirement(new OpenApiSecurityRequirement()

@@ -24,7 +24,7 @@ builder.Services.AddEndpointsApiExplorer();
 
 // adding swagger configuration with JWT support
 builder.AddSwaggerConfiguration();
-builder.AddJwtConfiguration();
+builder.AddJwtConfiguration(jwtConfig);
 
 // Establish Database connection
 builder.establishConnection();

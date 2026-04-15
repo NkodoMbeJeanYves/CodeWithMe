@@ -1,16 +1,17 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using CodeWithMe.Core.Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 namespace CodeWithMe.Core
 {
     public static class JwtConfiguration
     {
-        public static void AddJwtConfiguration(this WebApplicationBuilder builder)
+        public static void AddJwtConfiguration(this WebApplicationBuilder builder, JwtConfig jwtSettings)
         {
-            var jwtSettings = builder.Configuration.GetSection("JwtConfig");
-            var secretKey = jwtSettings["SecretKey"];
-            var issuer = jwtSettings["Issuer"];
-            var audience = jwtSettings["Audience"];
+            var secretKey = jwtSettings.SecretKey;
+            var issuer = jwtSettings.Issuer;
+            var audience = jwtSettings.Audience;
+
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
