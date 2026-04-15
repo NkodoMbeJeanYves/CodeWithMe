@@ -6,7 +6,7 @@ namespace CodeWithMe.EndPoints
 {
     public static class GameEndPoints
     {
-        const string GAME_END_POINT = "/games";
+        const string GAME_END_POINT = "api/games";
         private static readonly List<GameDto> _games = [
             new GameDto(1, "street fighter", "A fighting game developed by Capcom.", "Fighting", new DateOnly(1987, 8, 30), 19.99m),
             new GameDto(2, "mortal kombat", "A fighting game developed by Midway Games.", "Fighting", new DateOnly(1992, 10, 8), 29.99m),
@@ -68,7 +68,7 @@ namespace CodeWithMe.EndPoints
                 {
                     return Results.NotFound();
                 }
-                _games.RemoveAll(game=>game.Id == id);
+                _games.RemoveAll(game => game.Id == id);
                 return Results.NoContent();
             });
         }

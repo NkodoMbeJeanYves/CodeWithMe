@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CodeWithMe.Core
 {
-    public static class DataExtensions
+    public static class DatabaseExtensions
     {
         /*
          * this method extends the WebApplication class to include a method for migrating the database. 

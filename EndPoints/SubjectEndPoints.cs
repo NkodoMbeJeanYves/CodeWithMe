@@ -6,7 +6,7 @@ namespace CodeWithMe.EndPoints
 {
     public static class SubjectEndPoints
     {
-        const string SUBJECT_END_POINT = "/subjects";
+        const string SUBJECT_END_POINT = "api/subjects";
 
         public static void MapSubjectEndPoints(this WebApplication app)
         {
