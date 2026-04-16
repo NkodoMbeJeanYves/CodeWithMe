@@ -20,7 +20,9 @@ builder.Services.AddSingleton<JwtConfig>();
 builder.Configuration.GetSection("JwtConfig").Bind(jwtConfig);
 
 builder.Services.AddControllers();
-builder.Services.AddValidatorsFromAssemblyContaining<CreateSchoolDtoValidator>();
+
+//Register All validators of this Assembly Or Project
+builder.Services.AddValidatorsFromAssemblyContaining<CreateSchoolDtoValidator>(ServiceLifetime.Transient);
 
 //builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly, include)
 builder.Services.AddSingleton<FakeService>();
@@ -66,41 +68,21 @@ app.UseAuthorization();
 
 app.MapPost("/api/school", (CreateSchoolDto dto, IValidator<CreateSchoolDto> validator) =>
 {
+    // trigger manual validation
     var validationResult = validator.Validate(dto);
-    //var response = ApiResponse()
-    //{
-    //    Code = StatusCodes.Status201Created.ToString(),
-    //    Message = "school created succesfully",
-    //    Errors = new Dictionary<string, string[]>(),
-    //    TraceId = ""
-    //};
 
+    // check if validation doesnt passed
     if (!validationResult.IsValid)
     {
-        //var problemDetails = new HttpValidationProblemDetails((IDictionary<string, string[]>)validationResult.Errors)
-        //{
-        //    Status = StatusCodes.Status400BadRequest,
-        //    Title = "validation Failed",
-        //    Instance = "api/school"
-        //};
-        return Results.BadRequest(validationResult.Errors.ToArray().Select(it => new ValidationReport(it.PropertyName, it.ErrorMessage)));
-
-        //return Results.Problem(new
-        //{
-        //    Status = StatusCodes.Status400BadRequest.ToString(),
-        //    Title = "validation Failed",
-        //    Instance = "api/school",
-        //    Errors = validationResult.Errors.ToList()
-        //});
+        var dict = validationResult.Errors
+            .Select(it => new ValidationReport(it.PropertyName, it.ErrorMessage))
+            .ToDictionary(item => item.propertyName, item => new string[] { item.errorMessage });
+        return Results.ValidationProblem(dict);
     }
-    return Results.Ok(new
-    {
-        Code = StatusCodes.Status201Created.ToString(),
-        Message = "school created succesfully",
-        Errors = new Dictionary<string, string[]>(),
-        TraceId = ""
-    });
-});
+    return Results.Ok(new ApiResponse(
+        StatusCodes.Status201Created.ToString(), "school created succesfully", "")
+    );
+}).RequireAuthorization();
 
 app.MapGet("/token", () =>
 {
