@@ -1,10 +1,9 @@
 ﻿using CodeWithMe.Core.Dtos.School;
 using FluentValidation;
-using System.Globalization;
 
 namespace CodeWithMe.Core.Validators
 {
-    public class CreateSchoolDtoValidator : AbstractValidator<CreateSchoolDto>
+    public class CreateSchoolDtoValidator : AbstractValidator<SchoolDto>
     {
         public CreateSchoolDtoValidator()
         {
@@ -19,10 +18,10 @@ namespace CodeWithMe.Core.Validators
                 .IsInEnum();
 
             RuleFor(dto => dto.ClassStartTime)
-                .Must(BeAValidDate).WithMessage("Date must be in yyyy-MM-dd format");
+                .Must(BeAValidTime).WithMessage("Date must be in yyyy-MM-dd format");
 
             RuleFor(dto => dto.ClassEndTime)
-                .Must(BeAValidDate).WithMessage("Date must be in yyyy-MM-dd format");
+                .Must(BeAValidTime).WithMessage("Date must be in yyyy-MM-dd format");
 
             RuleFor(dto => dto.ClassDurationInMinutes)
                 .GreaterThan(0).WithMessage("This Field must be greater than 0");
@@ -31,31 +30,26 @@ namespace CodeWithMe.Core.Validators
                 .GreaterThan(0).WithMessage("This Field must be greater than 0");
 
             RuleFor(dto => dto.FirstBreakStartTime)
-                .Must(BeAValidDate).WithMessage("Date must be in yyyy-MM-dd format");
+                .Must(BeAValidTime).WithMessage("Date must be in yyyy-MM-dd format");
 
             RuleFor(dto => dto.SecondBreakDurationInMinutes)
                 .GreaterThan(0).When(dto => dto.SecondBreakDurationInMinutes.HasValue).WithMessage("This Field must be greater than 0 if provided");
 
             RuleFor(dto => dto.SecondBreakStartTime)
-                .Must(BeAValidDate).When(dto => !string.IsNullOrEmpty(dto.SecondBreakStartTime)).WithMessage("Date must be in yyyy-MM-dd format if provided");
+                .Must(value => value >= TimeSpan.Zero && value < TimeSpan.FromDays(1)).WithMessage("StartTime must be a valid time of day (00:00 to 23:59).");
 
             RuleFor(dto => dto.ThirdBreakDurationInMinutes)
                 .GreaterThan(0).When(dto => dto.ThirdBreakDurationInMinutes.HasValue).WithMessage("This Field must be greater than 0 if provided");
 
             RuleFor(dto => dto.ThirdBreakStartTime)
-                .Must(BeAValidDate).When(dto => !string.IsNullOrEmpty(dto.ThirdBreakStartTime)).WithMessage("Date must be in yyyy-MM-dd format if provided");
+                .Must(value => value >= TimeSpan.Zero && value < TimeSpan.FromDays(1)).WithMessage("StartTime must be a valid time of day (00:00 to 23:59).");
 
 
         }
 
-        private bool BeAValidDate(string value)
+        private bool BeAValidTime(TimeSpan value)
         {
-            return DateTime.TryParseExact(
-                value,
-                "yyyy-MM-dd",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None,
-                out _);
+            return value >= TimeSpan.Zero && value < TimeSpan.FromDays(1);
         }
     }
 }

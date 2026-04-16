@@ -66,7 +66,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapPost("/api/school", (CreateSchoolDto dto, IValidator<CreateSchoolDto> validator) =>
+app.MapPost("/api/school", (SchoolDto dto, IValidator<SchoolDto> validator) =>
 {
     // trigger manual validation
     var validationResult = validator.Validate(dto);

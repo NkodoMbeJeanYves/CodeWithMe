@@ -17,16 +17,16 @@ namespace CodeWithMe.Core.Models
         public required string Name { get; set; }
 
         [Column("school_type")]
-        public SchoolTypes SchoolType { get; set; }
+        public required string SchoolType { get; set; }
 
         [Column("description")]
         public required string Description { get; set; }
 
         [Column("class_start_time")]
-        public required string ClassStartTime { get; set; }
+        public required TimeSpan ClassStartTime { get; set; }
 
         [Column("class_end_time")]
-        public required string ClassEndTime { get; set; }
+        public required TimeSpan ClassEndTime { get; set; }
 
         [Column("class_duration")]
         public int ClassDurationInMinutes { get; set; }
@@ -35,27 +35,27 @@ namespace CodeWithMe.Core.Models
         public int FirstBreakDurationInMinutes { get; set; }
 
         [Column("first_break_start_time")]
-        public required string FirstBreakStartTime { get; set; }
+        public required TimeSpan FirstBreakStartTime { get; set; }
 
         [Column("second_break_duration")]
         public int? SecondBreakDurationInMinutes { get; set; }
 
         [Column("second_break_start_time")]
-        public string? SecondBreakStartTime { get; set; }
+        public TimeSpan? SecondBreakStartTime { get; set; }
 
         [Column("third_break_duration")]
         public int? ThirdBreakDurationInMinutes { get; set; }
 
         [Column("third_break_start_time")]
-        public string? ThirdBreakStartTime { get; set; }
+        public TimeSpan? ThirdBreakStartTime { get; set; }
 
         [Column("created_at")]
-        public required string CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
 
         [Column("updated_at")]
-        public required string UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
         [Column("deleted_at")]
-        public required string DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }
