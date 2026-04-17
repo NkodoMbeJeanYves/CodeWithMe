@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CodeWithMe.Core.Models
 {
@@ -11,6 +12,7 @@ namespace CodeWithMe.Core.Models
     public class School
     {
         [Column("school_id")]
+        [Key()]
         public required string SchoolId { get; set; }
 
         [Column("name")]

@@ -23,23 +23,57 @@ namespace MyApp.Namespace
         [HttpGet]
         public async Task<ActionResult<IEnumerable<School>>> Index()
         {
-            return await _context.Schools.AsNoTracking().ToListAsync();
+            try
+            {
+                return Ok(await _context.Schools.AsNoTracking().ToListAsync());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while fetching schools data");
+                // Return a 500 Internal Server Error with a message
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "An unexpected error occurred. Please try again later.");
+            }
         }
 
         [HttpGet("id")]
         public async Task<ActionResult<SchoolDto>> Get(string id)
         {
-            var school = await _context.Schools.FindAsync(id);
-            return school is null ? NotFound() : Ok(school);
+            try
+            {
+                var school = await _context.Schools.FindAsync(id);
+                return school is null ? NotFound() : Ok(school);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while fetching school with ID {id}", id);
+                // Return a 500 Internal Server Error with a message
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "An unexpected error occurred. Please try again later.");
+            }
         }
 
         [HttpPost]
         public async Task<ActionResult<SchoolDto>> store(SchoolDto dto)
         {
-            var school = dto.ToEntity();
-            _context.Schools.Add(school);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Get), new { id = school.SchoolId });
+            try
+            {
+                var school = dto.ToEntity();
+                school.SchoolId = Guid.NewGuid().ToString();
+                // TODO 
+                // Add A service to check the period params (breaks)
+                // manage createdAt,UpdatedAt and DeletedAt
+                _context.Schools.Add(school);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Get), new { id = school.SchoolId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while storing new school");
+                // Return a 500 Internal Server Error with a message
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    "An unexpected error occurred. Please try again later.");
+            }
         }
 
 
