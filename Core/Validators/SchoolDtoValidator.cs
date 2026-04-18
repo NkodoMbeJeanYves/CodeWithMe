@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace CodeWithMe.Core.Validators
 {
-    public class CreateSchoolDtoValidator : AbstractValidator<SchoolDto>
+    public class SchoolDtoValidator : AbstractValidator<SchoolDto>
     {
-        public CreateSchoolDtoValidator()
+        public SchoolDtoValidator()
         {
             RuleFor(dto => dto.Name)
                 .NotEmpty().WithMessage("Name Field is mandatory");

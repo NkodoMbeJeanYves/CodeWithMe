@@ -1,5 +1,6 @@
 using CodeWithMe.Controllers;
 using CodeWithMe.Core;
+using CodeWithMe.Core.DataExtensions;
 using CodeWithMe.Core.Dtos.School;
 using CodeWithMe.Core.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -21,11 +22,12 @@ namespace MyApp.Namespace
 
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<School>>> Index()
+        public async Task<ActionResult<IEnumerable<School>>> Index([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
-                return Ok(await _context.Schools.AsNoTracking().ToListAsync());
+                return Ok(await _context.Schools.OrderBy(s => s.Name)
+                    .AsNoTracking().ToPagedResultAsync(pageNumber, pageSize));
             }
             catch (Exception ex)
             {
@@ -53,7 +55,7 @@ namespace MyApp.Namespace
             }
         }
 
-        [HttpPost]
+        [HttpPost("create")]
         public async Task<ActionResult<SchoolDto>> store(SchoolDto dto)
         {
             try
@@ -62,10 +64,9 @@ namespace MyApp.Namespace
                 school.SchoolId = Guid.NewGuid().ToString();
                 // TODO 
                 // Add A service to check the period params (breaks)
-                // manage createdAt,UpdatedAt and DeletedAt
                 _context.Schools.Add(school);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Get), new { id = school.SchoolId });
+                return new ActionResult<SchoolDto>(school.ToDto());
             }
             catch (Exception ex)
             {

@@ -9,7 +9,7 @@ namespace CodeWithMe.Core.Models
     }
 
     [Table("schools")]
-    public class School
+    public class School : IHasTimestamps
     {
         [Column("school_id")]
         [Key()]

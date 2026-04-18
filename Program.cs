@@ -1,9 +1,9 @@
 using CodeWithMe.Core;
-using CodeWithMe.Core.Dtos.School;
 using CodeWithMe.Core.Models;
 using CodeWithMe.Core.Services;
 using CodeWithMe.Core.Validators;
 using CodeWithMe.EndPoints;
+using CodeWithMe.Middlewares;
 using FluentValidation;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -22,10 +22,12 @@ builder.Configuration.GetSection("JwtConfig").Bind(jwtConfig);
 builder.Services.AddControllers();
 
 //Register All validators of this Assembly Or Project
-builder.Services.AddValidatorsFromAssemblyContaining<CreateSchoolDtoValidator>(ServiceLifetime.Transient);
+builder.Services.AddValidatorsFromAssemblyContaining<SchoolDtoValidator>(ServiceLifetime.Transient);
 
 //builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly, include)
 builder.Services.AddSingleton<FakeService>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -66,23 +68,14 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapPost("/api/school", (SchoolDto dto, IValidator<SchoolDto> validator) =>
-{
-    // trigger manual validation
-    var validationResult = validator.Validate(dto);
 
-    // check if validation doesnt passed
-    if (!validationResult.IsValid)
-    {
-        var dict = validationResult.Errors
-            .Select(it => new ValidationReport(it.PropertyName, it.ErrorMessage))
-            .ToDictionary(item => item.propertyName, item => new string[] { item.errorMessage });
-        return Results.ValidationProblem(dict);
-    }
-    return Results.Ok(new ApiResponse(
-        StatusCodes.Status201Created.ToString(), "school created succesfully", "")
-    );
-}).RequireAuthorization();
+// Positionner avant MapControllers
+// GlobalExceptionMiddleware
+app.UseExceptionHandler();
+// Chaque requête qui contient un DTO validé par FluentValidation sera interceptée.
+// Si la validation échoue, le middleware renvoie directement un ValidationProblemDetails avec la route et la méthode.
+app.UseMiddleware<ValidationMiddleware>();
+
 
 app.MapGet("/token", () =>
 {
