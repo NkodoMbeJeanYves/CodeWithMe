@@ -1,7 +1,7 @@
-﻿using CodeWithMe.Core.Dtos.School;
+﻿using CodeWithMe.Core.Models;
 using FluentValidation;
 
-namespace CodeWithMe.Core.Validators
+namespace CodeWithMe.Core.Dtos.School
 {
     public class SchoolDtoValidator : AbstractValidator<SchoolDto>
     {
@@ -15,13 +15,14 @@ namespace CodeWithMe.Core.Validators
 
             RuleFor(dto => dto.SchoolType)
                 .NotEmpty().WithMessage("SchoolType Field is mandatory")
-                .IsInEnum();
+                .Must(value => Enum.TryParse(typeof(SchoolTypes), value, true, out _))
+                .WithMessage("SchoolType must be one of: 'COLLEGE','HIGH SCHOOL','UNIVERSITY'");
 
             RuleFor(dto => dto.ClassStartTime)
-                .Must(BeAValidTime).WithMessage("Date must be in yyyy-MM-dd format");
+                .Must(BeAValidTime).WithMessage("Time must be in HH:mm format");
 
             RuleFor(dto => dto.ClassEndTime)
-                .Must(BeAValidTime).WithMessage("Date must be in yyyy-MM-dd format");
+                .Must(BeValidTime).WithMessage("Time must be in HH:mm format");
 
             RuleFor(dto => dto.ClassDurationInMinutes)
                 .GreaterThan(0).WithMessage("This Field must be greater than 0");
@@ -30,7 +31,12 @@ namespace CodeWithMe.Core.Validators
                 .GreaterThan(0).WithMessage("This Field must be greater than 0");
 
             RuleFor(dto => dto.FirstBreakStartTime)
-                .Must(BeAValidTime).WithMessage("Date must be in yyyy-MM-dd format");
+                .Must(value => TimeSpan.TryParseExact(
+                value,
+                "hh\\:mm",              // format strict HH:mm
+                null,
+                out _
+            )).WithMessage("Time must be in HH:mm format");
 
             RuleFor(dto => dto.SecondBreakDurationInMinutes)
                 .GreaterThan(0).When(dto => dto.SecondBreakDurationInMinutes.HasValue).WithMessage("This Field must be greater than 0 if provided");
@@ -47,9 +53,25 @@ namespace CodeWithMe.Core.Validators
 
         }
 
-        private bool BeAValidTime(TimeSpan value)
+        public bool BeValidTime(string time)
         {
-            return value >= TimeSpan.Zero && value < TimeSpan.FromDays(1);
+            return TimeSpan.TryParseExact(
+                time,
+                "hh\\:mm",              // format strict HH:mm
+                null,
+                out _
+            );
+        }
+
+        private bool BeEndTimeAfterStartTime(string start, string end)
+        {
+            if (!BeValidTime(start) || !BeValidTime(end))
+                return false;
+
+            var startTime = TimeSpan.ParseExact(start, "hh\\:mm", null);
+            var endTime = TimeSpan.ParseExact(end, "hh\\:mm", null);
+
+            return endTime > startTime;
         }
     }
 }

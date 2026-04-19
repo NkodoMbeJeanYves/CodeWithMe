@@ -1,4 +1,3 @@
-using CodeWithMe.Controllers;
 using CodeWithMe.Core;
 using CodeWithMe.Core.DataExtensions;
 using CodeWithMe.Core.Dtos.School;
@@ -12,9 +11,9 @@ namespace MyApp.Namespace
     [ApiController]
     public class SchoolController : ControllerBase
     {
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<SchoolController> _logger;
         private readonly ApiContext _context;
-        public SchoolController(ILogger<WeatherForecastController> logger, ApiContext ctx)
+        public SchoolController(ILogger<SchoolController> logger, ApiContext ctx)
         {
             _context = ctx;
             _logger = logger;
