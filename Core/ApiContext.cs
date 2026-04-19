@@ -4,7 +4,7 @@ namespace CodeWithMe.Core
 {
     public class ApiContext(DbContextOptions<ApiContext> options) : DbContext(options)
     {
-        public DbSet<Subject> Subjects { get; set; }
+        public DbSet<Period> Subjects { get; set; }
         public DbSet<School> Schools { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
