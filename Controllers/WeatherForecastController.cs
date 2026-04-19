@@ -32,7 +32,8 @@ namespace CodeWithMe.Controllers
 
 
         [HttpPost("post")]
-        public IActionResult Register(WeatherForecast w) {
+        public IActionResult Register(WeatherForecast w)
+        {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState); // returns validation errors
