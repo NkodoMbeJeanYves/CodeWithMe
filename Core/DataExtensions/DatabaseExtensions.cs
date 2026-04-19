@@ -1,7 +1,7 @@
 ﻿using CodeWithMe.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace CodeWithMe.Core
+namespace CodeWithMe.Core.DataExtensions
 {
     public static class DatabaseExtensions
     {
@@ -13,36 +13,33 @@ namespace CodeWithMe.Core
          */
         public static void MigrateDb(this WebApplication app)
         {
-            using (var scope = app.Services.CreateScope())
+            using var scope = app.Services.CreateScope();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApiContext>();
+            dbContext.Database.Migrate();   // ensures DB is up-to-date, executing migration
+
+            if (!dbContext.Set<Subject>().Any())
             {
-                var dbContext = scope.ServiceProvider.GetRequiredService<ApiContext>();
-                dbContext.Database.Migrate();   // ensures DB is up-to-date, executing migration
-
-                if (!dbContext.Set<Subject>().Any())
-                {
-                    dbContext.Set<Subject>().AddRange(
-                        new Subject
-                        {
-                            SubjectId = "math",
-                            SubjectName = "Mathematics",
-                            Description = "The study of numbers, shapes, and patterns."
-                        },
-                        new Subject
-                        {
-                            SubjectId = "physics",
-                            SubjectName = "Physics",
-                            Description = "The study of matter, energy, and the fundamental forces of nature."
-                        },
-                        new Subject
-                        {
-                            SubjectId = "chemistry",
-                            SubjectName = "Chemistry",
-                            Description = "The study of substances, their properties, and how they interact with each other."
-                        }
-                    );
-                    dbContext.SaveChanges();
-                }
-
+                dbContext.Set<Subject>().AddRange(
+                    new Subject
+                    {
+                        SubjectId = "math",
+                        SubjectName = "Mathematics",
+                        Description = "The study of numbers, shapes, and patterns."
+                    },
+                    new Subject
+                    {
+                        SubjectId = "physics",
+                        SubjectName = "Physics",
+                        Description = "The study of matter, energy, and the fundamental forces of nature."
+                    },
+                    new Subject
+                    {
+                        SubjectId = "chemistry",
+                        SubjectName = "Chemistry",
+                        Description = "The study of substances, their properties, and how they interact with each other."
+                    }
+                );
+                dbContext.SaveChanges();
             }
 
         }

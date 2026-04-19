@@ -1,11 +1,12 @@
 using CodeWithMe.Core;
+using CodeWithMe.Core.DataExtensions;
+using CodeWithMe.Core.Dtos.School;
 using CodeWithMe.Core.Models;
 using CodeWithMe.Core.Services;
-using CodeWithMe.Core.Validators;
-using CodeWithMe.EndPoints;
 using CodeWithMe.Middlewares;
 using FluentValidation;
 using Microsoft.IdentityModel.Tokens;
+using Serilog;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -14,6 +15,13 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Serilog
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.File("Logs/app.log", rollingInterval: RollingInterval.Day)
+    .CreateLogger();
+
+builder.Host.UseSerilog();
 // Add services to the container.
 var jwtConfig = new JwtConfig();
 builder.Services.AddSingleton<JwtConfig>();
@@ -52,12 +60,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
-app.MapGet("/", static () => "Hello World!").RequireAuthorization();
-
-app.MapGameEndPoints();
-
-app.MapSubjectEndPoints();
 
 // Run database migrations, seed at startup
 // Ensure Database is populated and up-to-date with the latest schema changes
