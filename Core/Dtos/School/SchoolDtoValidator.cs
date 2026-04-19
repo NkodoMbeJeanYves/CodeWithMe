@@ -18,37 +18,77 @@ namespace CodeWithMe.Core.Dtos.School
                 .Must(value => Enum.TryParse(typeof(SchoolTypes), value, true, out _))
                 .WithMessage("SchoolType must be one of: 'COLLEGE','HIGH SCHOOL','UNIVERSITY'");
 
-            RuleFor(dto => dto.ClassStartTime)
-                .Must(BeAValidTime).WithMessage("Time must be in HH:mm format");
+            RuleFor(dto => dto).Custom((dto, context) =>
+            {
+                if (!TimeSpan.TryParseExact(dto.ClassEndTime, "hh\\:mm", null, out var endTime))
+                {
+                    context.AddFailure("ClassEndTime", "Invalid format, expected HH:mm");
+                }
 
-            RuleFor(dto => dto.ClassEndTime)
-                .Must(BeValidTime).WithMessage("Time must be in HH:mm format");
+                if (!TimeSpan.TryParseExact(dto.ClassStartTime, "hh\\:mm", null, out var startTime))
+                {
+                    context.AddFailure("ClassStartTime", "Invalid format, expected HH:mm");
+                }
+
+                if (endTime <= startTime)
+                {
+                    context.AddFailure("_", "End time must be after start time");
+                }
+            });
 
             RuleFor(dto => dto.ClassDurationInMinutes)
                 .GreaterThan(0).WithMessage("This Field must be greater than 0");
 
+            // FirstBreak Rules
             RuleFor(dto => dto.FirstBreakDurationInMinutes)
-                .GreaterThan(0).WithMessage("This Field must be greater than 0");
+                .GreaterThan(0)
+                .WithMessage("FirstBreakDurationInMinutes must be greater than 0.");
 
             RuleFor(dto => dto.FirstBreakStartTime)
-                .Must(value => TimeSpan.TryParseExact(
-                value,
-                "hh\\:mm",              // format strict HH:mm
-                null,
-                out _
-            )).WithMessage("Time must be in HH:mm format");
+                .Must(time => BeValidTime(time))
+                .WithMessage("FirstBreakStartTime must be in HH:mm format");
 
+            // SecondBreak Rules
             RuleFor(dto => dto.SecondBreakDurationInMinutes)
-                .GreaterThan(0).When(dto => dto.SecondBreakDurationInMinutes.HasValue).WithMessage("This Field must be greater than 0 if provided");
+                .GreaterThan(0)
+                .When(dto => !string.IsNullOrEmpty(dto.SecondBreakStartTime))
+                .WithMessage("SecondBreakDurationInMinutes must be greater than 0 if SecondBreakStartTime is provided");
 
             RuleFor(dto => dto.SecondBreakStartTime)
-                .Must(value => value >= TimeSpan.Zero && value < TimeSpan.FromDays(1)).WithMessage("StartTime must be a valid time of day (00:00 to 23:59).");
+                .Must(time => string.IsNullOrEmpty(time) || BeValidTime(time))
+                .WithMessage("SecondBreakStartTime must be in HH:mm format if provided");
 
+            // ThirdBreak Rules
             RuleFor(dto => dto.ThirdBreakDurationInMinutes)
-                .GreaterThan(0).When(dto => dto.ThirdBreakDurationInMinutes.HasValue).WithMessage("This Field must be greater than 0 if provided");
+                .GreaterThan(0)
+                .When(dto => !string.IsNullOrEmpty(dto.ThirdBreakStartTime))
+                .WithMessage("ThirdBreakDurationInMinutes must be greater than 0 if ThirdBreakStartTime is provided");
 
             RuleFor(dto => dto.ThirdBreakStartTime)
-                .Must(value => value >= TimeSpan.Zero && value < TimeSpan.FromDays(1)).WithMessage("StartTime must be a valid time of day (00:00 to 23:59).");
+                .Must(time => string.IsNullOrEmpty(time) || BeValidTime(time))
+                .WithMessage("ThirdBreakStartTime must be in HH:mm format if provided");
+
+            // Validation combinée sur l'ordre des pauses
+            RuleFor(dto => dto).Custom((dto, context) =>
+            {
+                if (!BeValidTime(dto.FirstBreakStartTime)) return;
+
+                var first = TimeSpan.ParseExact(dto.FirstBreakStartTime, "hh\\:mm", null);
+
+                if (!string.IsNullOrEmpty(dto.SecondBreakStartTime) && BeValidTime(dto.SecondBreakStartTime))
+                {
+                    var second = TimeSpan.ParseExact(dto.SecondBreakStartTime, "hh\\:mm", null);
+                    if (second <= first)
+                        context.AddFailure("SecondBreakStartTime", "Second break must be after first break");
+
+                    if (!string.IsNullOrEmpty(dto.ThirdBreakStartTime) && BeValidTime(dto.ThirdBreakStartTime))
+                    {
+                        var third = TimeSpan.ParseExact(dto.ThirdBreakStartTime, "hh\\:mm", null);
+                        if (third <= second)
+                            context.AddFailure("ThirdBreakStartTime", "Third break must be after second break");
+                    }
+                }
+            });
 
 
         }
@@ -61,17 +101,6 @@ namespace CodeWithMe.Core.Dtos.School
                 null,
                 out _
             );
-        }
-
-        private bool BeEndTimeAfterStartTime(string start, string end)
-        {
-            if (!BeValidTime(start) || !BeValidTime(end))
-                return false;
-
-            var startTime = TimeSpan.ParseExact(start, "hh\\:mm", null);
-            var endTime = TimeSpan.ParseExact(end, "hh\\:mm", null);
-
-            return endTime > startTime;
         }
     }
 }

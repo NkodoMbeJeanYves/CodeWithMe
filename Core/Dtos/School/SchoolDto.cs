@@ -4,15 +4,15 @@
         string Name,
         string SchoolType,
         string Description,
-        TimeSpan ClassStartTime,
-        TimeSpan ClassEndTime,
+        string ClassStartTime,
+        string ClassEndTime,
         int ClassDurationInMinutes,
         int FirstBreakDurationInMinutes,
-        TimeSpan FirstBreakStartTime,
+        string FirstBreakStartTime,
         int? SecondBreakDurationInMinutes = null,
-        TimeSpan? SecondBreakStartTime = null,
+        string? SecondBreakStartTime = null,
         int? ThirdBreakDurationInMinutes = null,
-        TimeSpan? ThirdBreakStartTime = null,
+        string? ThirdBreakStartTime = null,
         string? SchoolId = null
     );
 
@@ -23,15 +23,15 @@
                 school.Name,
                 school.SchoolType,
                 school.Description,
-                school.ClassStartTime,
-                school.ClassEndTime,
+                school.ClassStartTime.ToString(@"hh\:mm"),
+                school.ClassEndTime.ToString(@"hh\:mm"),
                 school.ClassDurationInMinutes,
                 school.FirstBreakDurationInMinutes,
-                school.FirstBreakStartTime,
+                school.FirstBreakStartTime.ToString(@"hh\:mm"),
                 school.SecondBreakDurationInMinutes,
-                school.SecondBreakStartTime,
+                school.SecondBreakStartTime?.ToString(@"hh\:mm"),
                 school.ThirdBreakDurationInMinutes,
-                school.ThirdBreakStartTime,
+                school.ThirdBreakStartTime?.ToString(@"hh\:mm"),
                 school.SchoolId
             );
 
@@ -41,15 +41,28 @@
             Name = dto.Name,
             SchoolType = dto.SchoolType,
             Description = dto.Description,
-            ClassStartTime = dto.ClassStartTime,
-            ClassEndTime = dto.ClassEndTime,
+            ClassStartTime = dto.ClassStartTime.AsTimeSpan(),
+            ClassEndTime = dto.ClassEndTime.AsTimeSpan(),
             ClassDurationInMinutes = dto.ClassDurationInMinutes,
             FirstBreakDurationInMinutes = dto.FirstBreakDurationInMinutes,
-            FirstBreakStartTime = dto.FirstBreakStartTime,
+            FirstBreakStartTime = dto.FirstBreakStartTime.AsTimeSpan(),
             SecondBreakDurationInMinutes = dto.SecondBreakDurationInMinutes,
-            SecondBreakStartTime = dto.SecondBreakStartTime,
+            SecondBreakStartTime = dto.SecondBreakStartTime?.AsTimeSpan(),
             ThirdBreakDurationInMinutes = dto.ThirdBreakDurationInMinutes,
-            ThirdBreakStartTime = dto.ThirdBreakStartTime,
+            ThirdBreakStartTime = dto.ThirdBreakStartTime?.AsTimeSpan(),
         };
+
+        public static TimeSpan AsTimeSpan(this string str)
+        {
+            TimeSpan value;
+            if (TimeSpan.TryParseExact(str, "hh\\:mm", null, out value))
+            {
+                return value;
+            }
+            else
+            {
+                throw new ArgumentException($"Unable to Parse {str}", str);
+            }
+        }
     }
 }
