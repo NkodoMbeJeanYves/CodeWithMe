@@ -27,9 +27,6 @@ public class Period : IHasTimestamps
     [Column("event_id")]
     public required string? EventId { get; set; }
 
-    [Column("school_id")]
-    public required string? SchoolId { get; set; }
-
     [Column("created_at")]
     public DateTime? CreatedAt { get; set; }
 
@@ -38,5 +35,10 @@ public class Period : IHasTimestamps
 
     [Column("deleted_at")]
     public DateTime? DeletedAt { get; set; }
+
+    // Relationship
+    [Column("school_id")]
+    public required string? SchoolId { get; set; }
+    public School? School { get; set; }
 
 }

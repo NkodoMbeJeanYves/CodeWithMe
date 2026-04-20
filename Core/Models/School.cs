@@ -59,5 +59,8 @@ namespace CodeWithMe.Core.Models
 
         [Column("deleted_at")]
         public DateTime? DeletedAt { get; set; }
+
+        // Relationship
+        public ICollection<Period> Periods { get; set; } = new List<Period>();
     }
 }

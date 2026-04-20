@@ -4,7 +4,7 @@ namespace CodeWithMe.Core
 {
     public class ApiContext(DbContextOptions<ApiContext> options) : DbContext(options)
     {
-        public DbSet<Period> Subjects { get; set; }
+        public DbSet<Period> Periods { get; set; }
         public DbSet<School> Schools { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
@@ -29,6 +29,15 @@ namespace CodeWithMe.Core
             }
 
             return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Relation one-to-many
+            modelBuilder.Entity<School>()
+                .HasMany(s => s.Periods)
+                .WithOne(p => p.School)
+                .HasForeignKey(p => p.SchoolId);
         }
     }
 

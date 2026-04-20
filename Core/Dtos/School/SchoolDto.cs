@@ -1,4 +1,6 @@
-﻿namespace CodeWithMe.Core.Dtos.School
+﻿using CodeWithMe.Core.Dtos.Period;
+
+namespace CodeWithMe.Core.Dtos.School
 {
     public record SchoolDto(
         string Name,
@@ -13,7 +15,8 @@
         string? SecondBreakStartTime = null,
         int? ThirdBreakDurationInMinutes = null,
         string? ThirdBreakStartTime = null,
-        string? SchoolId = null
+        string? SchoolId = null,
+        ICollection<PeriodDto>? PeriodDtos = null
     );
 
     public static class SchoolDtoExtensions

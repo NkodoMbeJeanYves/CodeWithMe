@@ -15,15 +15,15 @@ namespace CodeWithMe.Core.Dtos.Period
     public static class PeriodDtoExtensions
     {
         public static PeriodDto ToDto(this PeriodModel period) => new PeriodDto
-            (
-                period.PeriodType,
-                period.Day,
-                period.StartTime.ToString(@"hh\:mm"),
-                period.EndTime.ToString(@"hh\:mm"),
-                period.EventId,
-                period.SchoolId,
-                period.PeriodId
-            );
+        (
+            period.PeriodType,
+            period.Day,
+            period.StartTime.AsString(),
+            period.EndTime.AsString(),
+            period.EventId,
+            period.SchoolId,
+            period.PeriodId
+        );
 
         public static PeriodModel ToEntity(this PeriodDto dto) => new PeriodModel
         {
