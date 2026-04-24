@@ -1,10 +1,30 @@
-﻿using CodeWithMe.Core.Models;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace CodeWithMe.Core.Dtos.School
 {
+    public class SchoolUpdateDtoValidator : AbstractValidator<SchoolUpdateDto>
+    {
+        private static readonly string[] AllowedTypes =
+            { "COLLEGE", "HIGH SCHOOL", "UNIVERSITY" };
+        public SchoolUpdateDtoValidator()
+        {
+            RuleFor(dto => dto.Name)
+                .NotEmpty().WithMessage("Name Field is mandatory");
+            RuleFor(dto => dto.Description)
+                .NotEmpty().WithMessage("Description Field is mandatory");
+            RuleFor(dto => dto.SchoolType)
+                .Cascade(CascadeMode.StopOnFirstFailure)
+                .NotEmpty().WithMessage("SchoolType Field is mandatory")
+                .Must(value => AllowedTypes.Contains(value))
+                .WithMessage($"SchoolType must be one of: {string.Join(", ", AllowedTypes)}");
+        }
+    }
+
     public class SchoolDtoValidator : AbstractValidator<SchoolDto>
     {
+        private static readonly string[] AllowedTypes =
+            { "COLLEGE", "HIGH SCHOOL", "UNIVERSITY" };
+
         public SchoolDtoValidator()
         {
             RuleFor(dto => dto.Name)
@@ -15,8 +35,8 @@ namespace CodeWithMe.Core.Dtos.School
 
             RuleFor(dto => dto.SchoolType)
                 .NotEmpty().WithMessage("SchoolType Field is mandatory")
-                .Must(value => Enum.TryParse(typeof(SchoolTypes), value, true, out _))
-                .WithMessage("SchoolType must be one of: 'COLLEGE','HIGH SCHOOL','UNIVERSITY'");
+                .Must(value => AllowedTypes.Contains(value))
+                .WithMessage($"PeriodType must be one of: {string.Join(", ", AllowedTypes)}");
 
             RuleFor(dto => dto).Custom((dto, context) =>
             {

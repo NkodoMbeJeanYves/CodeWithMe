@@ -22,12 +22,13 @@ public class PeriodController : ControllerBase
         _context = ctx;
     }
     // GET: api/<PeriodController>
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<PeriodDto>>> Index([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    [HttpGet("/{schoolId}/school")]
+    public async Task<ActionResult<IEnumerable<PeriodDto>>> Index([FromRoute] string schoolId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
         try
         {
             return Ok(await _context.Periods
+                .Where(p => p.SchoolId == schoolId)
                 .Select(it => it.ToDto())
                 .AsNoTracking()
                 .ToPagedResultAsync(pageNumber, pageSize));

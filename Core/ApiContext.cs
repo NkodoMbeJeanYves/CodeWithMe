@@ -35,9 +35,21 @@ namespace CodeWithMe.Core
         {
             // Relation one-to-many
             modelBuilder.Entity<School>()
-                .HasMany(s => s.Periods)
-                .WithOne(p => p.School)
-                .HasForeignKey(p => p.SchoolId);
+                .HasMany(s => s.Periods);
+            //.WithOne(p => p.School)
+            //.HasForeignKey(p => p.SchoolId);
+
+            modelBuilder.Entity<School>()
+                .Property(p => p.SchoolType)
+                .HasConversion<string>();
+
+            modelBuilder.Entity<Period>()
+                .Property(p => p.PeriodType)
+                .HasConversion<string>(); // 👈 convertit enum ↔ string
+
+            //modelBuilder.Entity<Period>()
+            //    .HasOne<School>();
+
         }
     }
 

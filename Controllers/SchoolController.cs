@@ -1,8 +1,11 @@
 using CodeWithMe.Core;
 using CodeWithMe.Core.DataExtensions;
 using CodeWithMe.Core.Dtos.School;
+using CodeWithMe.Core.Models;
+using CodeWithMe.Core.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NuGet.Packaging;
 
 namespace MyApp.Namespace
 {
@@ -62,10 +65,11 @@ namespace MyApp.Namespace
         {
             try
             {
-                var school = dto.ToEntity();
-                school.SchoolId = Guid.NewGuid().ToString();
-                // TODO 
+                var schoolDto = dto with { SchoolId = Guid.NewGuid().ToString() };
+                var school = schoolDto.ToEntity();
+
                 // Add A service to check the period params (breaks)
+                school.Periods.AddRange<Period>(PeriodService.generatePeriods(dto, _logger).Select(p => p.ToEntity()).ToList());
                 _context.Schools.Add(school);
                 await _context.SaveChangesAsync();
                 return new ActionResult<SchoolDto>(school.ToDto());
@@ -81,13 +85,18 @@ namespace MyApp.Namespace
 
 
         [HttpPatch("{id}")]
-        public async Task<ActionResult<SchoolDto>> update(string id, [FromBody] SchoolDto dto)
+        public async Task<ActionResult<SchoolDto>> update(string id, [FromBody] SchoolUpdateDto dto)
         {
-            if (id != dto.SchoolId) return BadRequest();
-            var school = dto.ToEntity();
-            _context.Entry(school).State = EntityState.Modified;
+            // get school by id
+            var existingSchool = await _context.Schools.FindAsync(id);
+            if (existingSchool is null) return NotFound();
+
+            existingSchool.Name = dto.Name; // EF compares old vs new values and only updates if there are changes, so we can set the properties directly
+            existingSchool.Description = dto.Description;
+            existingSchool.SchoolType = dto.SchoolType;
+
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Get), new { id = school.SchoolId });
+            return new ActionResult<SchoolDto>(existingSchool.ToDto());
         }
 
 

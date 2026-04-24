@@ -3,11 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CodeWithMe.Core.Models
 {
-    public enum SchoolTypes
-    {
-        COLLEGE, HIGH_SCHOOL, UNIVERSITY
-    }
-
     [Table("schools")]
     public class School : IHasTimestamps
     {

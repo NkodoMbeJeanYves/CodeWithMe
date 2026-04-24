@@ -1,6 +1,4 @@
-﻿//using ITimestamps = CodeWithMe.Core.IHasTimestamps;
-
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CodeWithMe.Core.Models;
@@ -38,7 +36,8 @@ public class Period : IHasTimestamps
 
     // Relationship
     [Column("school_id")]
+    [ForeignKey("school")]
     public required string? SchoolId { get; set; }
-    public School? School { get; set; }
+    //public School? School { get; set; } = null;
 
 }
