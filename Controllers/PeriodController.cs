@@ -35,7 +35,7 @@ public class PeriodController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error while fetching schools data");
+            _logger.LogError(ex, "Unexpected error while fetching periods data");
             // Return a 500 Internal Server Error with a message
             return StatusCode(StatusCodes.Status500InternalServerError,
                 "An unexpected error occurred. Please try again later.");
@@ -54,7 +54,7 @@ public class PeriodController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Unexpected error while fetching school with ID {id}", id);
+            _logger.LogError(ex, "Unexpected error while fetching period with ID {id}", id);
             // Return a 500 Internal Server Error with a message
             return StatusCode(StatusCodes.Status500InternalServerError,
                 "An unexpected error occurred. Please try again later.");
