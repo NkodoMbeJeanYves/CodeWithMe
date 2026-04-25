@@ -3,11 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CodeWithMe.Core.Models
 {
-    public enum SchoolTypes
-    {
-        COLLEGE, HIGH_SCHOOL, UNIVERSITY
-    }
-
     [Table("schools")]
     public class School : IHasTimestamps
     {
@@ -59,5 +54,8 @@ namespace CodeWithMe.Core.Models
 
         [Column("deleted_at")]
         public DateTime? DeletedAt { get; set; }
+
+        // Relationship
+        public ICollection<Period> Periods { get; set; } = new List<Period>();
     }
 }

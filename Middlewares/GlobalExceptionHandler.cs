@@ -15,7 +15,7 @@ namespace CodeWithMe.Middlewares
         {
             LogError(exception);
             _logger.LogError(
-                exception, "Exception occurred: {Message}", exception.Message);
+                exception, "GlobalExceptionHandler: {Message}", exception.Message);
 
             var problemDetails = new ProblemDetails
             {
@@ -37,7 +37,7 @@ namespace CodeWithMe.Middlewares
             [System.Runtime.CompilerServices.CallerFilePath] string file = "",
             [System.Runtime.CompilerServices.CallerLineNumber] int line = 0)
         {
-            Log.Error(ex, "Unhandled exception at {File}:{Line}", file, line);
+            Log.Error(ex, "From GlobalExceptionHandler at {File}:{Line}", file, line);
         }
 
     }

@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-namespace CodeWithMe.Core
+namespace CodeWithMe.Core.DataExtensions
 {
     public static class JwtConfiguration
     {
