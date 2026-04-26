@@ -28,6 +28,7 @@ public static class WebApplicationBuilderExtension
         ValidatorOptions.CascadeMode = CascadeMode.StopOnFirstFailure;
 
         //builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly, include)
+        builder.Services.AddScoped(TokenService => new TokenService(jwtConfig));
         builder.Services.AddSingleton<FakeService>();
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         builder.Services.AddProblemDetails();
