@@ -1,4 +1,5 @@
 using CodeWithMe.Core.DataExtensions;
+using CodeWithMe.Core.Models;
 using CodeWithMe.Middlewares;
 using Serilog;
 
@@ -54,5 +55,6 @@ app.UseExceptionHandler();
 app.UseMiddleware<ValidationMiddleware>();
 
 app.MapControllers();
+app.MapIdentityApi<User>();
 
 app.Run();

@@ -3,6 +3,7 @@ using CodeWithMe.Core.Models;
 using CodeWithMe.Core.Services;
 using CodeWithMe.Middlewares;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 
 namespace CodeWithMe.Core.DataExtensions;
 
@@ -34,6 +35,16 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddProblemDetails();
         // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
+
+        // Identity
+        //builder.Services.AddIdentityCore<User>()
+        //    .AddEntityFrameworkStores<ApiContext>()
+        //    .AddApiEndpoints();
+        builder.Services.AddIdentity<User, IdentityRole>()
+            .AddEntityFrameworkStores<ApiContext>()
+            .AddApiEndpoints()
+            .AddDefaultTokenProviders();
+
         // adding swagger configuration with JWT support
         builder.AddSwaggerConfiguration();
         builder.AddJwtConfiguration(jwtConfig);

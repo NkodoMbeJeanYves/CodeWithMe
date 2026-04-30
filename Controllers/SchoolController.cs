@@ -48,6 +48,7 @@ namespace MyApp.Namespace
             {
                 var school = await _context.Schools
                     .Include(s => s.Periods)
+                    .Select(s => s.ToDto())
                     .FirstOrDefaultAsync(s => s.SchoolId == id); ;
                 return school is null ? NotFound() : Ok(school);
             }
@@ -61,7 +62,7 @@ namespace MyApp.Namespace
         }
 
         [HttpPost("create")]
-        public async Task<ActionResult<SchoolDto>> store(SchoolDto dto)
+        public async Task<ActionResult<SchoolDto>> Create(SchoolDto dto)
         {
             try
             {
