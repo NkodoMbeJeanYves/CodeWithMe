@@ -91,8 +91,9 @@ public class TokenService
             }, out SecurityToken validatedToken);
             return true;
         }
-        catch
+        catch (Exception ex)
         {
+            Console.WriteLine($"Token invalid: {ex.Message}");
             return false;
         }
     }

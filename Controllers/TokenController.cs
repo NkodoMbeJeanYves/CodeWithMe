@@ -12,12 +12,14 @@ namespace CodeWithMe.Controllers;
 
 [Route("api/tokens")]
 [ApiController]
+[Authorize]
 public class TokenController : ControllerBase
 {
     private readonly JwtConfig _jwtConfig;
     private readonly TokenService _tokenService;
     private readonly ApiContext _context;
     private readonly UserManager<User> _userManager;
+    private readonly string _token;
 
     public TokenController(IOptions<JwtConfig> jwtConfig, TokenService tokenService, ApiContext context, UserManager<User> userManager)
     {
@@ -25,10 +27,15 @@ public class TokenController : ControllerBase
         _tokenService = tokenService;
         _context = context;
         _userManager = userManager;
+
+        var authHeader = Request.Headers["Authorization"].ToString();
+        _token = authHeader.StartsWith("Bearer ") ? authHeader.Substring("Bearer ".Length).Trim() : string.Empty;
+
     }
 
     // POST /api/tokens/login
     [HttpPost("login")]
+    [AllowAnonymous]
     public IActionResult Login([FromBody] LoginDto dto)
     {
         var user = _userManager.Users.FirstOrDefault(u => u.UserName == dto.Username);
@@ -46,7 +53,7 @@ public class TokenController : ControllerBase
         _context.RefreshTokens.Add(refreshToken);
         _context.SaveChanges();
 
-        return Ok(new { token = tokenDto.AccessToken, Expires = tokenDto.AccessTokenExpiry });
+        return Ok(new { Token = tokenDto.AccessToken, Expires = tokenDto.AccessTokenExpiry, RefreshToken = tokenDto.RefreshToken });
     }
 
     /**
@@ -92,17 +99,16 @@ public class TokenController : ControllerBase
 
 
 
-    [HttpPost("/{token}/validate")]
-    [Authorize]
-    public IActionResult Validate([FromRoute] string token)
+    [HttpPost("validate")]
+    public IActionResult Validate()
     {
-        return _tokenService.ValidateToken(token) ? Ok(new { Valid = true }) : BadRequest(new { Valid = false });
+        return _tokenService.ValidateToken(_token) ? Ok(new { Valid = true }) : BadRequest(new { Valid = false });
     }
 
-    [HttpPost("refresh/{token}/revoke")]
-    public async Task RevokeRefreshToken(string token)
+    [HttpPost("refresh-token/revoke")]
+    public async Task RevokeRefreshToken([FromBody] RefreshTokenRequest request)
     {
-        var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == token);
+        var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == request.Token);
         if (refreshToken != null)
         {
             refreshToken.IsRevoked = true;
@@ -110,11 +116,18 @@ public class TokenController : ControllerBase
         }
     }
 
-    [HttpPatch("refresh/{token}/check")]
-    public async Task<bool> IsRefreshTokenValid(string token)
+    [HttpPatch("refresh-token/validate")]
+    public async Task<bool> IsRefreshTokenValid([FromBody] RefreshTokenRequestDto request)
     {
-        var refreshToken = await _context.RefreshTokens.FirstAsync(rt => rt.Token == token);
+        var refreshToken = await _context.RefreshTokens.FirstAsync(rt => rt.Token == request.Token);
         return refreshToken != null && !refreshToken.IsRevoked && refreshToken.Expires > DateTime.UtcNow;
+    }
+
+    [HttpGet("me")]
+    public IActionResult GetUserInfo()
+    {
+        var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+        return Ok(new { Claims = claims, Token = _token });
     }
 
 }

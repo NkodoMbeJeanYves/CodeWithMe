@@ -13,3 +13,8 @@ public class RefreshRequestDto
     public DateTime AccessTokenExpiry { get; set; }
 }
 
+public class RefreshTokenRequestDto
+{
+    public string Token { get; set; } = string.Empty;
+}
+
