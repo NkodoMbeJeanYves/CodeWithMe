@@ -17,12 +17,18 @@ public class TokenService
         _jwtConfig = jwtConfig;
     }
 
-    public (RefreshRequestDto, RefreshToken) GenerateJwtToken(string username)
+    public (RefreshRequestDto, RefreshToken) GenerateJwtToken(User user)
     {
         var key = Encoding.UTF8.GetBytes(_jwtConfig.SecretKey);
+        var username = user.UserName ?? string.Empty;
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[] { new Claim(ClaimTypes.Name, username) }),
+            Subject = new ClaimsIdentity(new[] {
+                new Claim(ClaimTypes.Name, username),
+                new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
+            }),
+
             Expires = DateTime.UtcNow.AddMinutes(_jwtConfig.ExpirationMinutes),
             Issuer = _jwtConfig.Issuer,
             Audience = _jwtConfig.Audience,
@@ -57,7 +63,7 @@ public class TokenService
             ValidateAudience = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtConfig.SecretKey)),
-            ValidateLifetime = false // ignore expiration
+            ValidateLifetime = true // ignore expiration
         };
 
         var tokenHandler = new JwtSecurityTokenHandler();

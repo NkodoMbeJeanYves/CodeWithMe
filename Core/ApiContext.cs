@@ -12,6 +12,7 @@ namespace CodeWithMe.Core
         public DbSet<Period> Periods { get; set; }
         public DbSet<School> Schools { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<RevokedToken> RevokedTokens { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {

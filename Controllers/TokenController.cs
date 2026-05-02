@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using System.Security.Claims;
 
 namespace CodeWithMe.Controllers;
 
@@ -19,7 +20,7 @@ public class TokenController : ControllerBase
     private readonly TokenService _tokenService;
     private readonly ApiContext _context;
     private readonly UserManager<User> _userManager;
-    private readonly string _token;
+    private string _token;
 
     public TokenController(IOptions<JwtConfig> jwtConfig, TokenService tokenService, ApiContext context, UserManager<User> userManager)
     {
@@ -28,8 +29,8 @@ public class TokenController : ControllerBase
         _context = context;
         _userManager = userManager;
 
-        var authHeader = Request.Headers["Authorization"].ToString();
-        _token = authHeader.StartsWith("Bearer ") ? authHeader.Substring("Bearer ".Length).Trim() : string.Empty;
+        //var authHeader = Request.Headers["Authorization"].ToString();
+        //_token = authHeader.StartsWith("Bearer ") ? authHeader.Substring("Bearer ".Length).Trim() : string.Empty;
 
     }
 
@@ -47,13 +48,13 @@ public class TokenController : ControllerBase
         //"email": "nkodomjy@gmail.com",
         //"password": "Password@2026"
 
-        var (tokenDto, refreshToken) = _tokenService.GenerateJwtToken(dto.Username);
+        var (tokenDto, refreshToken) = _tokenService.GenerateJwtToken(user);
 
         // Save refresh token to the database
         _context.RefreshTokens.Add(refreshToken);
         _context.SaveChanges();
 
-        return Ok(new { Token = tokenDto.AccessToken, Expires = tokenDto.AccessTokenExpiry, RefreshToken = tokenDto.RefreshToken });
+        return Ok(new { tokenDto.AccessToken, tokenDto.AccessTokenExpiry, tokenDto.RefreshToken });
     }
 
     /**
@@ -71,10 +72,6 @@ public class TokenController : ControllerBase
         if (_tokenService.ValidateToken(dto.AccessToken))
             return Ok("Token Is Still Valid");
 
-        var principal = _tokenService.GetPrincipalFromToken(dto.AccessToken);
-        if (principal == null)
-            return BadRequest("Invalid access token");
-
         // Check if the refresh token exists in the database
         var rToken = await _context.RefreshTokens
             .FirstOrDefaultAsync(rt => rt.Token == dto.RefreshToken && !rt.IsRevoked && rt.Expires > DateTime.UtcNow);
@@ -83,12 +80,15 @@ public class TokenController : ControllerBase
             return BadRequest("Invalid refresh token");
 
         // Optionally, you can also check if the username in the refresh token matches the username in the access token for added security
-        var usernameFromAccessToken = principal.Identity?.Name;
+        //var user = HttpContext.User;
+        var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+        var usernameFromAccessToken = claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+        var email = claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
         if (rToken.UserName != usernameFromAccessToken)
             return BadRequest("Refresh token does not match the access token");
 
         // generate new access token
-        var (accessToken, refreshToken) = _tokenService.GenerateJwtToken(principal?.Identity?.Name ?? "UserName");
+        var (accessToken, refreshToken) = _tokenService.GenerateJwtToken(new User { UserName = usernameFromAccessToken, Email = email });
 
         // revoke the old refresh token
         rToken.IsRevoked = true;
@@ -97,16 +97,38 @@ public class TokenController : ControllerBase
         return Ok(new { accessToken, refreshToken });
     }
 
+    // Revoke a token by its JTI (JWT ID). This is useful for blacklisting tokens before they expire.
+    // use NameIdentifier to get the JTI from the token and then call this endpoint to revoke it.
+    [HttpPost("revoke")]
+    public IActionResult Revoke([FromBody] string nameIdentifier)
+    {
+        var check = _context.RevokedTokens.Any(rt => rt.Jti == nameIdentifier);
+        if (check)
+            return BadRequest(new { Message = "Token is already revoked" });
+
+        _context.RevokedTokens.Add(new RevokedToken
+        {
+            Jti = nameIdentifier,
+            RevokedAt = DateTime.UtcNow
+        });
+        _context.SaveChanges();
+
+        return Ok(new { Message = "Token revoked successfully" });
+    }
+
+
 
 
     [HttpPost("validate")]
     public IActionResult Validate()
     {
+        var authHeader = Request.Headers["Authorization"].ToString();
+        _token = authHeader.StartsWith("Bearer ") ? authHeader.Substring("Bearer ".Length).Trim() : string.Empty;
         return _tokenService.ValidateToken(_token) ? Ok(new { Valid = true }) : BadRequest(new { Valid = false });
     }
 
     [HttpPost("refresh-token/revoke")]
-    public async Task RevokeRefreshToken([FromBody] RefreshTokenRequest request)
+    public async Task RevokeRefreshToken([FromBody] RefreshTokenRequestDto request)
     {
         var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(rt => rt.Token == request.Token);
         if (refreshToken != null)
@@ -126,6 +148,8 @@ public class TokenController : ControllerBase
     [HttpGet("me")]
     public IActionResult GetUserInfo()
     {
+        var authHeader = Request.Headers["Authorization"].ToString();
+        _token = authHeader.StartsWith("Bearer ") ? authHeader.Substring("Bearer ".Length).Trim() : string.Empty;
         var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
         return Ok(new { Claims = claims, Token = _token });
     }
