@@ -40,24 +40,6 @@ if (app.Environment.IsDevelopment())
 // Ensure Database is populated and up-to-date with the latest schema changes
 // app.MigrateDb();
 
-//app.UseHttpsRedirection();
-//// Set Default JWT Token validation for all endpoints. This middleware will set a valid JWT token in the Authorization header of incoming requests.
-//app.UseMiddleware<DefaultJwtMiddleware>();
-//app.UseMiddleware<JwtRevocationMiddleware>();
-//app.UseAuthentication();
-//app.UseAuthorization();
-
-
-//// Positionner avant MapControllers
-//// GlobalExceptionMiddleware
-//app.UseExceptionHandler();
-//// Chaque requête qui contient un DTO validé par FluentValidation sera interceptée.
-//// Si la validation échoue, le middleware renvoie directement un ValidationProblemDetails avec la route et la méthode.
-//app.UseMiddleware<ValidationMiddleware>();
-
-//app.MapControllers();
-//app.MapIdentityApi<User>();
-
 // 1. Gestion globale des exceptions
 app.UseExceptionHandler();
 

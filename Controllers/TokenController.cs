@@ -20,7 +20,7 @@ public class TokenController : ControllerBase
     private readonly TokenService _tokenService;
     private readonly ApiContext _context;
     private readonly UserManager<User> _userManager;
-    private string _token;
+    private string _token = string.Empty;
 
     public TokenController(IOptions<JwtConfig> jwtConfig, TokenService tokenService, ApiContext context, UserManager<User> userManager)
     {
@@ -28,10 +28,6 @@ public class TokenController : ControllerBase
         _tokenService = tokenService;
         _context = context;
         _userManager = userManager;
-
-        //var authHeader = Request.Headers["Authorization"].ToString();
-        //_token = authHeader.StartsWith("Bearer ") ? authHeader.Substring("Bearer ".Length).Trim() : string.Empty;
-
     }
 
     // POST /api/tokens/login
@@ -122,7 +118,7 @@ public class TokenController : ControllerBase
     [HttpPost("validate")]
     public IActionResult Validate()
     {
-        var authHeader = Request.Headers["Authorization"].ToString();
+        var authHeader = Request.Headers.Authorization.ToString();
         _token = authHeader.StartsWith("Bearer ") ? authHeader.Substring("Bearer ".Length).Trim() : string.Empty;
         return _tokenService.ValidateToken(_token) ? Ok(new { Valid = true }) : BadRequest(new { Valid = false });
     }
@@ -148,7 +144,7 @@ public class TokenController : ControllerBase
     [HttpGet("me")]
     public IActionResult GetUserInfo()
     {
-        var authHeader = Request.Headers["Authorization"].ToString();
+        var authHeader = Request.Headers.Authorization.ToString();
         _token = authHeader.StartsWith("Bearer ") ? authHeader.Substring("Bearer ".Length).Trim() : string.Empty;
         var claims = User.Claims.Select(c => new { c.Type, c.Value }).ToList();
         return Ok(new { Claims = claims, Token = _token });

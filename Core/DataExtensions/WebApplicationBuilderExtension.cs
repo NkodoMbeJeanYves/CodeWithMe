@@ -37,9 +37,6 @@ public static class WebApplicationBuilderExtension
         builder.Services.AddEndpointsApiExplorer();
 
         // Identity
-        //builder.Services.AddIdentityCore<User>()
-        //    .AddEntityFrameworkStores<ApiContext>()
-        //    .AddApiEndpoints();
         builder.Services.AddIdentity<User, IdentityRole>()
             .AddEntityFrameworkStores<ApiContext>()
             .AddApiEndpoints()
