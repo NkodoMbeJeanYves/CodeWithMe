@@ -11,13 +11,13 @@ namespace CodeWithMe.Core.DataExtensions
          * and calls the Migrate method on the database to apply any pending migrations. 
          * This ensures that the database schema is up to date with the application's data model when the application starts.
          */
-        public static void MigrateDb(this WebApplication app)
+        public static void MigrateDb(this WebApplication app, bool shouldApplySeed = false)
         {
             using var scope = app.Services.CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<ApiContext>();
             dbContext.Database.Migrate();   // ensures DB is up-to-date, executing migration
 
-            if (!dbContext.Set<Subject>().Any())
+            if (shouldApplySeed && !dbContext.Set<Subject>().Any())
             {
                 dbContext.Set<Subject>().AddRange(
                     new Subject

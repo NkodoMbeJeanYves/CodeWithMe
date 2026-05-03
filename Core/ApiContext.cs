@@ -1,11 +1,18 @@
 ﻿using CodeWithMe.Core.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 namespace CodeWithMe.Core
 {
-    public class ApiContext(DbContextOptions<ApiContext> options) : DbContext(options)
+    public sealed class ApiContext : IdentityDbContext<User>
     {
+
+        public ApiContext(DbContextOptions<ApiContext> options) : base(options)
+        {
+        }
         public DbSet<Period> Periods { get; set; }
         public DbSet<School> Schools { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<RevokedToken> RevokedTokens { get; set; }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
@@ -33,6 +40,7 @@ namespace CodeWithMe.Core
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder); // ✅ Important!
             // Relation one-to-many
             modelBuilder.Entity<School>()
                 .HasMany(s => s.Periods);
