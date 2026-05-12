@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CodeWithMe.Core.Models
 {
     [Table("schools")]
-    public class School : IHasTimestamps
+    public class School : HasTimestamps
     {
         [Column("school_id")]
         [Key()]
@@ -46,16 +46,8 @@ namespace CodeWithMe.Core.Models
         [Column("third_break_start_time")]
         public TimeSpan? ThirdBreakStartTime { get; set; }
 
-        [Column("created_at")]
-        public DateTime? CreatedAt { get; set; }
-
-        [Column("updated_at")]
-        public DateTime? UpdatedAt { get; set; }
-
-        [Column("deleted_at")]
-        public DateTime? DeletedAt { get; set; }
-
         // Relationship
-        public ICollection<Period> Periods { get; set; } = new List<Period>();
+        public virtual ICollection<Period> Periods { get; set; } = new List<Period>();
+        public virtual ICollection<ProgramModel> Programs { get; set; } = new List<ProgramModel>();
     }
 }

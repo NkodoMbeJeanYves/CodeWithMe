@@ -1,33 +1,16 @@
 using CodeWithMe.Core.DataExtensions;
 using CodeWithMe.Core.Models;
 using CodeWithMe.Middlewares;
-using Serilog;
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog
-Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .WriteTo.File("Logs/app.log", rollingInterval: RollingInterval.Day)
-    .CreateLogger();
 
-builder.Host.UseSerilog();
 
 // Initialize Application Services
-builder.InitializeApplicationServices();
-
 // Establish Database connection
-builder.establishConnection();
-
-// Enabling Logger
-builder.Logging.ClearProviders();
-builder.Logging.AddConsole();
-builder.Logging.AddDebug();
-
-
-var app = builder.Build();
+var app = builder.InitializeApplicationServices().establishConnection();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

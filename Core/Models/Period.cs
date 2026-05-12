@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CodeWithMe.Core.Models;
 
 [Table("periods")]
-public class Period : IHasTimestamps
+public class Period : HasTimestamps
 {
     [Column("period_id")]
     [Key()]
@@ -24,15 +24,6 @@ public class Period : IHasTimestamps
 
     [Column("event_id")]
     public required string? EventId { get; set; }
-
-    [Column("created_at")]
-    public DateTime? CreatedAt { get; set; }
-
-    [Column("updated_at")]
-    public DateTime? UpdatedAt { get; set; }
-
-    [Column("deleted_at")]
-    public DateTime? DeletedAt { get; set; }
 
     // Relationship
     [Column("school_id")]

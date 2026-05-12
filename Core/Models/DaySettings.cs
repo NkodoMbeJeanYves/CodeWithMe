@@ -1,5 +1,8 @@
-﻿namespace CodeWithMe.Core.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
+namespace CodeWithMe.Core.Models;
+
+[NotMapped]
 public class DaySettings
 {
     public string Language { get; set; } = "EN";

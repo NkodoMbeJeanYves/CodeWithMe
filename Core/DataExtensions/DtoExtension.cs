@@ -1,6 +1,10 @@
 ﻿using CodeWithMe.Core.Dtos.Period;
+using CodeWithMe.Core.Dtos.Program;
 using CodeWithMe.Core.Dtos.School;
+using CodeWithMe.Core.Dtos.Subject;
+using CodeWithMe.Core.Models;
 using PeriodModel = CodeWithMe.Core.Models.Period;
+using ProgramModel = CodeWithMe.Core.Models.ProgramModel;
 using SchoolModel = CodeWithMe.Core.Models.School;
 
 namespace CodeWithMe.Core.DataExtensions;
@@ -64,4 +68,33 @@ public static class DtoExtension
         ThirdBreakDurationInMinutes = dto.ThirdBreakDurationInMinutes,
         ThirdBreakStartTime = dto.ThirdBreakStartTime?.AsTimeSpan(),
     };
+
+    public static ProgramDto ToDto(this ProgramModel program) => new ProgramDto
+    {
+        ProgramId = program.Program_id,
+        Name = program.Name,
+        SchoolId = program.SchoolId
+    };
+
+    public static ProgramModel ToEntity(this ProgramDto dto) => new ProgramModel
+    {
+        Program_id = dto.ProgramId,
+        Name = dto.Name,
+        SchoolId = dto.SchoolId
+    };
+
+    public static Subject ToEntity(this SubjectDto dto) => new Subject
+    {
+        SubjectId = dto.SubjectId,
+        SubjectName = dto.SubjectName,
+        Description = dto.Description,
+    };
+
+    public static SubjectDto ToDto(this Subject subject) => new SubjectDto
+    {
+        SubjectId = subject.SubjectId,
+        SubjectName = subject.SubjectName,
+        Description = subject.Description,
+    };
+
 }
