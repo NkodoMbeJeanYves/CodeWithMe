@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 using System.Security.Claims;
 
 namespace CodeWithMe.Controllers;
@@ -16,15 +15,13 @@ namespace CodeWithMe.Controllers;
 [Authorize]
 public class TokenController : ControllerBase
 {
-    private readonly JwtConfig _jwtConfig;
     private readonly TokenService _tokenService;
     private readonly ApiContext _context;
     private readonly UserManager<User> _userManager;
     private string _token = string.Empty;
 
-    public TokenController(IOptions<JwtConfig> jwtConfig, TokenService tokenService, ApiContext context, UserManager<User> userManager)
+    public TokenController(TokenService tokenService, ApiContext context, UserManager<User> userManager)
     {
-        _jwtConfig = jwtConfig.Value;
         _tokenService = tokenService;
         _context = context;
         _userManager = userManager;
@@ -35,9 +32,9 @@ public class TokenController : ControllerBase
     [AllowAnonymous]
     public IActionResult Login([FromBody] LoginDto dto)
     {
-        var user = _userManager.Users.FirstOrDefault(u => u.UserName == dto.Username);
+        var user = _userManager.Users.FirstOrDefault(u => u.Email == dto.Username);
         if (user == null)
-            return Unauthorized();
+            return Unauthorized("Invalid username or password.");
 
         if (!_userManager.CheckPasswordAsync(user, dto.Password).Result)
             return Unauthorized();

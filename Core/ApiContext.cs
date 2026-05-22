@@ -5,18 +5,19 @@ namespace CodeWithMe.Core
 {
     public sealed class ApiContext : IdentityDbContext<User>
     {
-
-        public ApiContext(DbContextOptions<ApiContext> options) : base(options)
-        {
-        }
         public DbSet<Period> Periods { get; set; }
         public DbSet<School> Schools { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<ProgramModel> Programs { get; set; }
         public DbSet<RevokedToken> RevokedTokens { get; set; }
+        public DbSet<Subject> Subjects { get; set; }
+        public ApiContext(DbContextOptions<ApiContext> options) : base(options)
+        {
+        }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
-            var entries = ChangeTracker.Entries<IHasTimestamps>();
+            var entries = ChangeTracker.Entries<HasTimestamps>();
 
             foreach (var entry in entries)
             {

@@ -23,7 +23,7 @@ public class PeriodController : ControllerBase
     }
     // GET: api/<PeriodController>
     [HttpGet("/{schoolId}/school")]
-    public async Task<ActionResult<IEnumerable<PeriodDto>>> Index([FromRoute] string schoolId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    public async Task<ActionResult<IQueryable<PeriodDto>>> Index([FromRoute] string schoolId, [FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
     {
         try
         {
