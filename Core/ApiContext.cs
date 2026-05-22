@@ -11,9 +11,7 @@ namespace CodeWithMe.Core
         public DbSet<ProgramModel> Programs { get; set; }
         public DbSet<RevokedToken> RevokedTokens { get; set; }
         public DbSet<Subject> Subjects { get; set; }
-        public ApiContext(DbContextOptions<ApiContext> options) : base(options)
-        {
-        }
+        public ApiContext(DbContextOptions<ApiContext> options) : base(options) { }
 
         public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
         {
