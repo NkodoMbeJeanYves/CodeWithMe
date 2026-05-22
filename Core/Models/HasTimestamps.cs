@@ -6,9 +6,9 @@ namespace CodeWithMe.Core.Models;
 public class HasTimestamps : IHasTimestamps
 {
     [Column("created_at")]
-    public DateTime? CreatedAt { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public DateTime? CreatedAt { get; set; }
     [Column("updated_at")]
-    public DateTime? UpdatedAt { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public DateTime? UpdatedAt { get; set; }
     [Column("deleted_at")]
-    public DateTime? DeletedAt { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public DateTime? DeletedAt { get; set; }
 }

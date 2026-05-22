@@ -7,6 +7,8 @@ namespace CodeWithMe.Core
     {
         public static void AddSwaggerConfiguration(this WebApplicationBuilder builder)
         {
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(
    static it =>
    {

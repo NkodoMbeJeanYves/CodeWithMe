@@ -6,6 +6,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Threading.RateLimiting;
 
 namespace CodeWithMe.Core.DataExtensions;
 
@@ -42,8 +43,6 @@ public static class StartupExtension
         builder.Services.AddSingleton<FakeService>();
         builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
         builder.Services.AddProblemDetails();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
 
         // Identity
         builder.Services.AddIdentity<User, IdentityRole>()
@@ -128,5 +127,28 @@ public static class StartupExtension
         builder.Logging.AddDebug();
 
         return builder.Build();
+    }
+
+    public static WebApplicationBuilder InitializeRateLimiterServices(this WebApplicationBuilder builder)
+    {
+        // Add rate limiting policies
+        builder.Services.AddRateLimiter(options =>
+        {
+            options.AddPolicy("GlobalPolicy", context =>
+            {
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: context.User.Identity?.Name ?? context.Request.Headers.Host.ToString(),
+                    factory: partition => new FixedWindowRateLimiterOptions
+                    {
+                        AutoReplenishment = true,
+                        PermitLimit = 10, // Max requests allowed
+                        QueueLimit = 2, // Requests queued before rejection
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                        // Allow only 10 requests per minute per user or host, with a queue of 2 requests before rejecting additional requests.
+                    });
+            });
+        });
+        return builder;
     }
 }

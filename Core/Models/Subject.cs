@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CodeWithMe.Core.Models
 {
-    [Table("CWM_Subjects")]
+    [Table("Subjects")]
     public class Subject : HasTimestamps
     {
         [Column("subject_id")]
