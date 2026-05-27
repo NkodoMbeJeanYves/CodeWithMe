@@ -3,7 +3,10 @@
     "allow": [
       "Bash(dotnet build *)",
       "Bash(dotnet ef *)",
-      "Bash(dotnet tool *)"
+      "Bash(dotnet tool *)",
+      "Bash(dotnet --list-runtimes)",
+      "Bash(dotnet --list-sdks)",
+      "Bash(winget install *)"
     ]
   }
 }
