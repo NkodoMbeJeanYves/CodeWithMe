@@ -30,6 +30,20 @@ namespace CodeWithMe.Core
         public DbSet<Timetable> Timetables { get; set; } = null!;
         public DbSet<TimetableEntry> TimetableEntries { get; set; } = null!;
 
+        // ---- Domaine admin ----
+        public DbSet<AuditLog> AuditLogs { get; set; } = null!;
+
+        // ---- Domaine finance ----
+        public DbSet<Invoice> Invoices { get; set; } = null!;
+        public DbSet<Payment> Payments { get; set; } = null!;
+        public DbSet<PayrollPeriod> PayrollPeriods { get; set; } = null!;
+        public DbSet<PayrollRun> PayrollRuns { get; set; } = null!;
+
+        // ---- Domaine communication ----
+        public DbSet<Announcement> Announcements { get; set; } = null!;
+        public DbSet<Message> Messages { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
+
         public ApiContext(DbContextOptions<ApiContext> options, ITenantContext tenantContext)
             : base(options)
         {

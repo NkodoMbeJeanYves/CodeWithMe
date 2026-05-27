@@ -40,8 +40,13 @@ if (app.Environment.IsDevelopment())
 }
 
 // Run database migrations, seed at startup
-// Ensure Database is populated and up-to-date with the latest schema changes
-// app.MigrateDb();
+// ⚠️ À activer SEULEMENT après avoir généré la migration contract-v1 :
+//     dotnet tool install --global dotnet-ef
+//     dotnet ef migrations add ContractV1Schema
+//     dotnet ef database update
+// Une fois la migration disponible, décommenter la ligne ci-dessous pour
+// appliquer la migration ET seeder les 8 comptes mock du contrat (section 8.3).
+// if (app.Environment.IsDevelopment()) await app.MigrateDbAsync(shouldApplySeed: true);
 
 // 1. Gestion globale des exceptions
 app.UseExceptionHandler();

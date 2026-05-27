@@ -79,37 +79,24 @@ public static class StartupExtension
          * and calls the Migrate method on the database to apply any pending migrations. 
          * This ensures that the database schema is up to date with the application's data model when the application starts.
          */
-    public static void MigrateDb(this WebApplication app, bool shouldApplySeed = false)
+    /// <summary>
+    /// Applique les migrations EF puis seed les comptes mock du contrat (section 8.3).
+    /// ⚠️ À activer dans Program.cs seulement APRÈS avoir généré une migration couvrant
+    /// le nouveau schéma (multi-tenant + academic + admin + finance + communication) :
+    ///     dotnet tool install --global dotnet-ef
+    ///     dotnet ef migrations add ContractV1Schema
+    /// Sinon EF tentera d'appliquer un schéma incomplet et crashera au démarrage.
+    /// </summary>
+    public static async Task MigrateDbAsync(this WebApplication app, bool shouldApplySeed = true)
     {
-        using var scope = app.Services.CreateScope();
+        await using var scope = app.Services.CreateAsyncScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApiContext>();
-        dbContext.Database.Migrate();   // ensures DB is up-to-date, executing migration
+        await dbContext.Database.MigrateAsync();
 
-        if (shouldApplySeed && !dbContext.Set<Subject>().Any())
+        if (shouldApplySeed)
         {
-            dbContext.Set<Subject>().AddRange(
-                new Subject
-                {
-                    SubjectId = "math",
-                    SubjectName = "Mathematics",
-                    Description = "The study of numbers, shapes, and patterns."
-                },
-                new Subject
-                {
-                    SubjectId = "physics",
-                    SubjectName = "Physics",
-                    Description = "The study of matter, energy, and the fundamental forces of nature."
-                },
-                new Subject
-                {
-                    SubjectId = "chemistry",
-                    SubjectName = "Chemistry",
-                    Description = "The study of substances, their properties, and how they interact with each other."
-                }
-            );
-            dbContext.SaveChanges();
+            await Seeder.SeedContractAccountsAsync(app.Services);
         }
-
     }
 
     public static WebApplication establishConnection(this WebApplicationBuilder builder)
