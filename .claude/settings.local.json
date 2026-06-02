@@ -6,7 +6,8 @@
       "Bash(dotnet tool *)",
       "Bash(dotnet --list-runtimes)",
       "Bash(dotnet --list-sdks)",
-      "Bash(winget install *)"
+      "Bash(winget install *)",
+      "Bash(powershell -Command ' *)"
     ]
   }
 }

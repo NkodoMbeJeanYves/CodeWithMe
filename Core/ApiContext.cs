@@ -1,5 +1,6 @@
 using System.Reflection;
 using CodeWithMe.Core.Models;
+using CodeWithMe.Core.Models.Edu;
 using CodeWithMe.Core.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +45,83 @@ namespace CodeWithMe.Core
         public DbSet<Message> Messages { get; set; } = null!;
         public DbSet<Notification> Notifications { get; set; } = null!;
 
+        // ====== Domaine Edu (architecture edu_manager) ======
+
+        // Tenant / Établissement
+        public DbSet<Campus> EduCampus { get; set; } = null!;
+        public DbSet<AnneeAcademique> EduAnneesAcademiques { get; set; } = null!;
+        public DbSet<PeriodeEdu> EduPeriodes { get; set; } = null!;
+        public DbSet<EvenementCalendrier> EduEvenementsCalendrier { get; set; } = null!;
+        public DbSet<Salle> EduSalles { get; set; } = null!;
+        public DbSet<SalleEquipement> EduSalleEquipements { get; set; } = null!;
+        public DbSet<CreneauHoraire> EduCreneauxHoraires { get; set; } = null!;
+
+        // Structure académique
+        public DbSet<Cycle> EduCycles { get; set; } = null!;
+        public DbSet<FiliereEdu> EduFilieres { get; set; } = null!;
+        public DbSet<Niveau> EduNiveaux { get; set; } = null!;
+        public DbSet<ClasseEdu> EduClasses { get; set; } = null!;
+        public DbSet<Promotion> EduPromotions { get; set; } = null!;
+        public DbSet<Groupe> EduGroupes { get; set; } = null!;
+
+        // Référentiel pédagogique
+        public DbSet<Matiere> EduMatieres { get; set; } = null!;
+        public DbSet<UniteEnseignement> EduUniteEnseignements { get; set; } = null!;
+
+        // Apprenants
+        public DbSet<Apprenant> EduApprenants { get; set; } = null!;
+        public DbSet<Tuteur> EduTuteurs { get; set; } = null!;
+        public DbSet<PieceJustificative> EduPiecesJustificatives { get; set; } = null!;
+
+        // Enseignants
+        public DbSet<Enseignant> EduEnseignants { get; set; } = null!;
+        public DbSet<EnseignantSpecialite> EduEnseignantSpecialites { get; set; } = null!;
+        public DbSet<AffectationMatiere> EduAffectationsMatieres { get; set; } = null!;
+        public DbSet<Indisponibilite> EduIndisponibilites { get; set; } = null!;
+
+        // Inscriptions
+        public DbSet<Inscription> EduInscriptions { get; set; } = null!;
+        public DbSet<InscriptionGroupe> EduInscriptionGroupes { get; set; } = null!;
+        public DbSet<InscriptionUE> EduInscriptionUEs { get; set; } = null!;
+        public DbSet<PeriodeInscription> EduPeriodesInscription { get; set; } = null!;
+        public DbSet<ListeAttente> EduListesAttente { get; set; } = null!;
+        public DbSet<InscriptionHistorique> EduInscriptionHistoriques { get; set; } = null!;
+
+        // EDT
+        public DbSet<CoursPlanifie> EduCoursPlanifies { get; set; } = null!;
+        public DbSet<Seance> EduSeances { get; set; } = null!;
+
+        // Notes
+        public DbSet<Evaluation> EduEvaluations { get; set; } = null!;
+        public DbSet<NoteEdu> EduNotes { get; set; } = null!;
+        public DbSet<NoteHistorique> EduNotesHistorique { get; set; } = null!;
+        public DbSet<MoyenneMatiere> EduMoyennesMatieres { get; set; } = null!;
+        public DbSet<MoyenneGenerale> EduMoyennesGenerales { get; set; } = null!;
+
+        // Absences
+        public DbSet<Presence> EduPresences { get; set; } = null!;
+        public DbSet<Absence> EduAbsences { get; set; } = null!;
+        public DbSet<Justificatif> EduJustificatifs { get; set; } = null!;
+        public DbSet<AbsenceEnseignant> EduAbsencesEnseignants { get; set; } = null!;
+        public DbSet<ParametresAbsenteisme> EduParametresAbsenteisme { get; set; } = null!;
+
+        // Bulletins / Délibérations
+        public DbSet<Bulletin> EduBulletins { get; set; } = null!;
+        public DbSet<BulletinLigne> EduBulletinLignes { get; set; } = null!;
+        public DbSet<Deliberation> EduDeliberations { get; set; } = null!;
+        public DbSet<DeliberationMembre> EduDeliberationMembres { get; set; } = null!;
+        public DbSet<DeliberationLigne> EduDeliberationLignes { get; set; } = null!;
+
+        // Examens
+        public DbSet<SessionExamen> EduSessionsExamen { get; set; } = null!;
+        public DbSet<Epreuve> EduEpreuves { get; set; } = null!;
+        public DbSet<Convocation> EduConvocations { get; set; } = null!;
+        public DbSet<PVExamen> EduPVExamens { get; set; } = null!;
+        public DbSet<CasFraude> EduCasFraude { get; set; } = null!;
+
+        // Communication
+        public DbSet<ModeleMessage> EduModelesMessage { get; set; } = null!;
+
         public ApiContext(DbContextOptions<ApiContext> options, ITenantContext tenantContext)
             : base(options)
         {
@@ -67,6 +145,12 @@ namespace CodeWithMe.Core
                 }
             }
 
+            foreach (var entry in ChangeTracker.Entries<BaseEntity>()
+                .Where(e => e.State == EntityState.Modified))
+            {
+                entry.Entity.UpdatedAt = DateTime.UtcNow;
+            }
+
             // Force le tenant courant sur tout INSERT d'entité ITenantScoped.
             foreach (var entry in ChangeTracker.Entries<ITenantScoped>())
             {
@@ -82,6 +166,9 @@ namespace CodeWithMe.Core
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Apply all Fluent API configurations from this assembly (Edu domain)
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApiContext).Assembly);
 
             // ---- Filtre global multi-tenant ----
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
